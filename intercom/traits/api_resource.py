@@ -33,9 +33,13 @@ def to_datetime_value(value):
 
 
 class Resource(object):
+    client = None
     changed_attributes = []
 
-    def __init__(_self, **params):  # noqa
+    def __init__(_self, *args, **params):  # noqa
+        if args:
+            _self.client = args[0]
+
         # intercom includes a 'self' field in the JSON, to avoid the naming
         # conflict we go with _self here
         _self.from_dict(params)
@@ -68,6 +72,14 @@ class Resource(object):
         if hasattr(self, 'id'):
             # already exists in Intercom
             self.changed_attributes = []
+
+    def to_dict(self):
+        a_dict = {}
+        for name in list(self.__dict__.keys()):
+            if name == "changed_attributes":
+                continue
+            a_dict[name] = self.__dict__[name]  # direct access
+        return a_dict
 
     @property
     def attributes(self):
